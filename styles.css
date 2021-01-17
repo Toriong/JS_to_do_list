@@ -1,0 +1,55 @@
+* {
+  box-sizing: border-box;
+  /* padding: 0; */
+  text-align: center;
+  margin: 0;
+}
+
+header h1 {
+  margin: 50px;
+}
+
+.to-do-list-adder {
+  border: pink solid 2px;
+  width: 100%;
+  height: 100px;
+}
+
+h5 {
+  margin: 10px;
+}
+
+.user-confirmed-to-dos {
+  border: solid 2px black;
+}
+
+.to-do-list-container {
+  border: solid 2px orange;
+  width: 100%;
+  height: 500px;
+}
+
+.user-confirmed-to-dos-container {
+  border: solid 2px blue;
+  width: 100%;
+  height: 300px;
+  /* text-align: center; */
+}
+
+#confirmed-to-do-list {
+  text-align: center;
+  /* float: left;
+  margin-right: 5px; */
+}
+
+.listDecoration {
+  list-style: none;
+}
+li {
+  list-style: none;
+}
+
+/* .float {
+  float: left;
+  margin-right: 5px;
+} */

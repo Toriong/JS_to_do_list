@@ -1,8 +1,8 @@
 
 var toDoList;
 toDoList = document.querySelector("#confirmed-to-do-list");
-
 var userInput;
+
 userInput = document.querySelector(".to-do-input");
 
 //END GOAL: add to the to-do list
@@ -16,13 +16,61 @@ var userDueDateInput = document.querySelector("#due-date");
 var ToDoEntry = document.createTextNode(userInput.value)
 
 
-function newListItem() {
-    var newLi = document.createElement("li")
-    return newLi;
+
+
+function delFromToDoListPromptAndRemoval(listItem) {
+    return function () {
+        if (confirm("Do you want to delete this entry?")) {
+            listItem.remove("li");
+            alert("Entry has been deleted.")
+        } else {
+            alert("No changes has occured.")
+        }
+    }
+}
+
+function completedButtonPromptAndMoveToComp(listItem, userDueDate,textDisplayDueDate, compButton) {
+        return function(){if (confirm("You pressed 'completed.' This is task will now be inserted into your completion list. Press 'Ok' to continue.")) {
+        listItem.removeChild(userDueDate);
+        listItem.removeChild(textDisplayDueDate);
+            // add attribute: "complete on *current date*"
+        listItem.removeChild(compButton)
+        completionList.appendChild(listItem);
+            
+        
+        } else {
+            alert("No changes has occured.")
+        }
+    }
+}
+var toDoArray = [];
+
+function save() {
+    return localStorage.setItem("Todos", toDoArray);
+}
+
+var deletedItems = toDoArray.filter(function (value) {
+    return 
+})
+function addUserInputToArray() {
+    storeInArray = toDoArray.push(userInput.value)
+    stringifyToDoArray = JSON.stringify(storeInArray);
+    save()
+    return stringifyToDoArray;
+    
+}
+function delFromToDoListPromptAndRemoval(listItem) {
+    return function () {
+        if (confirm("Do you want to delete this entry?")) {
+            listItem.remove("li");
+            alert("Entry has been deleted.")
+        } else {
+            alert("No changes has occured.")
+        }
+    }
 }
 
 function addToDo() {
-    
     var newLi = document.createElement("li");
     var singleSeparator = document.createTextNode(" | ");
     var dueDateText = document.createTextNode(" | DUE ON: ");
@@ -43,54 +91,56 @@ function addToDo() {
     delButton.appendChild(delButtonText);
     newLi.appendChild(delButton);
     toDoList.appendChild(newLi);
-    function delFromToDoListPromptAndRemoval(){
-        if (confirm("Do you want to delete this entry?")) {
-        newLi.remove("li");
-        alert("Entry has been deleted.")
-    } else {
-        alert("No changes has occured.")
-    }
-    }
-    delButton.addEventListener("click", delFromToDoListPromptAndRemoval)
-    function completedButtonPromptAndMoveToComp() {
-        if (confirm("You pressed 'completed.' This is task will now be inserted into your completion list. Press 'Ok' to continue.")) {
-        newLi.removeChild(dueDate);
-            newLi.removeChild(dueDateText);
-            // add attribute: "complete on *current date*"
-        newLi.removeChild(completedButton)
-        completionList.appendChild(newLi);
-            
-        
-        } else {
-            alert("No changes has occured.")
-        }
-}
-    completedButton.addEventListener("click", completedButtonPromptAndMoveToComp);
+
+    delButton.addEventListener("click", delFromToDoListPromptAndRemoval(newLi))
+    completedButton.addEventListener("click", completedButtonPromptAndMoveToComp(newLi, dueDate, dueDateText, completedButton));
 
 }
-    
+
+
+
 
 var submitButton = document.querySelector(".submit");
 submitButton.addEventListener("click", addToDo);
 
+
 // create an array to store to-do's
-var toDoArray = [];
-//create an object to name to-do's
+
+var userDueDatesStoredArray = [];
 
 function toDoName(name) {
-    this.name = name;
+    return this.name = name;
 }
 
-function addToDoToArray() {
-    var add = toDoName(userInput.value)
-    toDoArray.push(add);
-    saveToDo();
-}
+
+
+submitButton.addEventListener("click", addUserInputToArray);
+
+
+// storeUserInputIntoVar = function (input) {
+//     userInputAsVar = input 
+//     save()
+//     return userInputAsVar; 
+    
+// }
+
+// var userInputStored = storeUserInputIntoVar(userInput.value);
+
+// function appendMe(variable) {
+//     return toDoArray.push(variable);
+// }
+
+
+// submitButton.addEventListener("click", userInputStored);
+// submitButton.addEventListener("click", userInputStored)
+// submitButton.addEventListener("click", appendMe(userInputStored));
+
+var compList = [];
 //to save to-do's from the user into the local storage
-function saveToDo() {
-    var jsonStrToDo = JSON.stringify(toDoArray);
-    localStorage.setItem("todos",jsonStrToDo);
-}
+// function saveToDo() {
+//     var jsonStrToDo = JSON.stringify(toDoArray);
+//     localStorage.setItem("todos",jsonStrToDo);
+// }
 
 
 
@@ -98,6 +148,6 @@ function saveToDo() {
 // var toDoDueDateArray = [];
 
 
-// var userDueDatesStoredArray = [];
+
 
 

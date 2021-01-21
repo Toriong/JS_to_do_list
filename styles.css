@@ -16,7 +16,7 @@ header {
 }
 
 .to-do-list-adder {
-  border: pink solid 2px;
+  /* border: pink solid 2px; */
   width: 100%;
   height: 210px;
 }
@@ -30,17 +30,17 @@ h5 {
 }
 
 .user-confirmed-to-dos {
-  border: solid 2px black;
+  /* border: solid 2px black; */
 }
 
 .to-do-list-container {
-  border: solid 2px orange;
+  /* border: solid 2px orange; */
   width: 100%;
   height: 500px;
 }
 
 .user-confirmed-to-dos-container {
-  border: solid 2px blue;
+  /* border: solid 2px blue; */
   width: 100%;
   height: 300px;
   /* text-align: center; */
@@ -57,7 +57,7 @@ h5 {
 }
 li {
   list-style: none;
-  border: black solid 2px;
+  /* border: black solid 2px; */
 }
 
 /* .float {
@@ -66,5 +66,9 @@ li {
 } */
 
 .to-do-confirmed-entry {
-  border: black solid 2px;
+  /* border: black solid 2px; */
+}
+
+.container {
+  background-color: white;
 }

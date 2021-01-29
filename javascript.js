@@ -10,117 +10,87 @@ var userInput = document.querySelector(".to-do-input");
 
 var ToDoEntry = document.createTextNode(userInput.value)
 var submitButton = document.querySelector(".submit");
-
-
-
+submitButton.addEventListener("click", addToDo);
 
 
 var toDoArray = [];
 var compList = [];
 
-
-
-
-function deleteItemFromCompArray(deleteThisItem) {    
-        var filterCompArray = compList.filter(function (compListItem) {
-            return compListItem !== deleteThisItem;
-        })
-        compList = filterCompArray;
-        saveCompList();
-        console.log("Saved: ", compList);
-    
-}
-
-function delFromToDoListPromptAndRemoval(listItem, deleteThisItem) {
-    return function () {
-        if (confirm("Do you want to delete this entry?")) {
-            listItem.remove("li");
-            deleteItemInToDoArray(deleteThisItem);
-            alert("Entry has been deleted.")
-        }
-        else {
-            alert("No changes has occured.")
-        }
-    }
-}
-
-function delItemInCompListAndArray(item, userInput) {
-    return function () {
-        if (confirm("This item will now be deleted from your completion list. Press 'OK' to continue.")) {
-            deleteItemFromCompArray(userInput);
-            item.remove("li");
-            alert("Entry has been deleted from your completion list.")
-        }
-        else {
-             alert("No changes has occured.")
-   }
- }
-}
-
-
-
 function moveTaskToCompListArray(task) {
     compList.push(task);
-    // saveCompList(compList);
     saveCompList(compList);
     console.log("Your completions: ", compList);
     
 }
-function getToDoTaskPutThemIntoToDoArray() {
-     
-        if (toDoArray.length == 0) {
-            alert("Local storage is empty")
-        } else if (localStorage.getItem("Saved To Do's" !== null)){
-            var savedUserToDos = localStorage.getItem('Saved To Do\'s');
-            var savedUserToDosAsJson = JSON.stringify(savedUserToDos);
-            console.log(savedUserToDosAsJson);
-        }
-    
-    
-}
-// bring back "Saved To Do's as a array in order to add new items after refresh"
 function addToDo() {
-    var buttonForCompList = document.createElement("button");
-    var textForCompListButton = document.createTextNode("DEL");
-    buttonForCompList.appendChild(textForCompListButton);   
-    var newLi = document.createElement("li");
     var task = userInput.value;
     if (toDoArray.length === null || 0) {
-        //check if toDoArry is empty
         addToDoArray(task);
     } else if (toDoArray.length !== null || 0) {
-        //if not empty, add to the toDoArray
-        //after refresh, get item's from local storage under the name of 'Saved To Do's', JSON stringify them, and add each one to the toDoArray
-        //make a function for the above task
-        toDoArray.push(userInput.value);
+        addToDoArray(task)
     }
     saveToDoList(toDoArray);
-    newLi.appendChild(document.createTextNode(task));
-    var completedButton = document.createElement("button");
-    var completedButtonText = document.createTextNode("COMPELETED")
-    completedButton.appendChild(completedButtonText);
-    newLi.appendChild(completedButton);
-    var delButton = document.createElement("button");
-    var delButtonText = document.createTextNode("DEL");
-    delButton.appendChild(delButtonText);
-    newLi.appendChild(delButton);
+    var newLi = liAndButtonsDom(task);
     toDoList.prepend(newLi);
-    delButton.addEventListener("click", delFromToDoListPromptAndRemoval(newLi, task));
-    completedButton.addEventListener("click", completedButtonPromptAndMoveToComp(newLi, completedButton, task, delButton, buttonForCompList))
-    buttonForCompList.addEventListener("click", delItemInCompListAndArray(newLi, task));
+    
    
 }
 
-
-function delItemFromToDoArrayWhenCompButtonIsClicked(deleteThisItem) {
-    var filteredToDoArray = toDoArray.filter(function (todoItem) {
-        return todoItem !== deleteThisItem;
-            })
-            toDoArray = filteredToDoArray;
+function deleteItemInArrayAndFromDom(deleteThisItem, li) {
+    return function () {
+        if (confirm("This item will be deleted. Press 'OK' to continue.")) {
+            if (toDoArray.includes(deleteThisItem)) {
+                var index = toDoArray.indexOf(deleteThisItem);
+                toDoArray.splice(index, 1);
+            } else if (compList.includes(deleteThisItem)) {
+                var index = compList.indexOf(deleteThisItem);
+                compList.splice(index, 1);
+            }
             saveToDoList(toDoArray);
+            saveCompList();
+            li.remove('li');
+            console.log("I was removed.")
+            alert("Item has been deleted.")
+        } else {
+            alert("No changes has occured.")
+        }
+    }
+    
 }
 
-function completedButtonPromptAndMoveToComp(listItem, compButton, task, deleteButton, newDelButton) {
+function liAndButtonsDom(userInput) {
+    var liForList;
+    var delButton = document.createElement("button");
+    delButton.appendChild(document.createTextNode('DEL'));
+    var newLi = document.createElement("li");
+    if (toDoArray.includes(userInput)) {
+        newLi.appendChild(document.createTextNode(userInput));
+        var completedButton = document.createElement("button");
+        completedButton.appendChild(document.createTextNode("COMPELETED"));
+        newLi.appendChild(completedButton)    
+        newLi.appendChild(delButton);
+        delButton.addEventListener("click", deleteItemInArrayAndFromDom(userInput, newLi));
+        completedButton.addEventListener("click", completedButtonPromptAndMoveToComp(newLi, completedButton, userInput))
+        liForList = newLi;
+    } else if (compList.includes(userInput)) {
+        newLi.appendChild(document.createTextNode(userInput));
+        newLi.appendChild(delButton);
+        delButton.addEventListener("click", deleteItemInArrayAndFromDom(userInput, newLi));
+        liForList = newLi;
+    }
+    return liForList;
+}
+
+
+
+function delItemFromToDoArrayWhenCompButtonIsClicked(deleteThisItem) {
+    var index = toDoArray.indexOf(deleteThisItem);
+    toDoArray.splice(index, 1);
+    saveToDoList(toDoArray);
+    saveCompList();
+}
+
+function completedButtonPromptAndMoveToComp(listItem, compButton, task) {
     return function () {
         if (
             confirm("You pressed 'completed.' This is task will now be inserted into your completion list Press 'Ok' to continue.")
@@ -128,9 +98,7 @@ function completedButtonPromptAndMoveToComp(listItem, compButton, task, deleteBu
             moveTaskToCompListArray(task);
             delItemFromToDoArrayWhenCompButtonIsClicked(task);
             listItem.removeChild(compButton)
-            listItem.removeChild(deleteButton);
-            listItem.appendChild(newDelButton);
-            completionList.appendChild(listItem);
+            completionList.prepend(listItem);
             
         
         }
@@ -144,30 +112,6 @@ function saveToDoList(toDoArray) {
     localStorage.setItem("Saved To Do's", JSON.stringify(toDoArray));
 }
 
-function saveCompList() {
-    return localStorage.setItem("Saved completions", JSON.stringify(compList));
-}
-
-
-
-var toDoArray = [];
-var compList = [];
-
-
-
-
-
-function deleteItemInToDoArray(deleteThisItem) {
-            var filteredToDoArray = toDoArray.filter(function (todoItem) {
-                return todoItem !== deleteThisItem
-            })
-            toDoArray = filteredToDoArray;
-            saveToDoList(toDoArray);
-            console.log('ToDoArray saved: ', toDoArray);
-}
-
-
-
 function addToDoArray(item) {
     toDoArray.push(item);
     saveToDoList(toDoArray);
@@ -177,161 +121,87 @@ function addToDoArray(item) {
 
 
 
-submitButton.addEventListener("click", addToDo);
-function delItemFromToDoArrayWhenCompButtonIsClicked(deleteThisItem) {
-    var filteredToDoArray = toDoArray.filter(function (todoItem) {
-                return todoItem !== deleteThisItem
-            })
-            toDoArray = filteredToDoArray;
-            saveToDoList(toDoArray);
+
+var clearOptions = document.getElementById("clear-options-container");
+var clearAll = document.getElementById("clear-all");
+var clearToDos = document.getElementById("clear-to-dos");
+var clearCompList = document.getElementById("clear-completions");
+var clearConfirmedButton = document.querySelector("#clear-button");
+
+
+function clearAllToDos() {
+    toDoArray.splice(0);
+    saveToDoList(toDoArray);
+    toDoList.innerHTML = " ";
+}
+function clearAllComps() {
+    compList.splice(0)
+    saveCompList();
+    completionList.innerHTML = " ";
 }
 
 
-submitButton.addEventListener("click", addToDo);
-
-
-
-
-
-
-
-function toDoItems(array) {
-    var toDos = [];
-    for (var i = 0; i < array.length; i+=1) {
-        if (i % 2 !== 1)
-            toDos.push(array[i])
-    }
-    return toDos;
-}
-
-function toDoItemsAsTextNode(toDoArray) {
-    var toDos = toDoItems(toDoArray);
+function clearDomList() {
     return function () {
-        toDos.forEach(function (item) {
-            var li = document.createElement("li");
-            var ItemAsTextNode = document.createTextNode(item);
-            return document.write(li.appendChild(ItemAsTextNode));
-        })
-    }
-}
-
-
-        
-
-function displayTaskOnRefresh() {
-    if (localStorage.getItem('Saved To Do\'s') !== null || 0) {
-        var savedUserToDos = localStorage.getItem('Saved To Do\'s');
-        // console.log("saved user todos", savedUserToDos);
-        localStorage.setItem("Saved To Do\'s", savedUserToDos);
-        var tasks = JSON.parse(savedUserToDos);
-        // console.log("user tasks: ", tasks);
-        tasks.forEach(function (item) {
-            var completedButton = document.createElement("button");
-            var completedButtonText = document.createTextNode("COMPELETED");
-            completedButton.appendChild(completedButtonText);
-            var delButton = document.createElement("button");
-            var delButtonText = document.createTextNode("DEL");
-            delButton.appendChild(delButtonText);
-            var newLi = document.createElement("li");
-            var text = document.createTextNode(item);
-            toDoArray.push(item);
-            newLi.appendChild(text);
-            newLi.appendChild(completedButton);
-            newLi.appendChild(delButton);
-            toDoList.prepend(newLi);
-            var buttonForCompList = document.createElement("button");
-            var textForCompListButton = document.createTextNode("DEL");
-            buttonForCompList.appendChild(textForCompListButton);
-            completedButton.addEventListener("click", completedButtonPromptAndMoveToComp(newLi, completedButton, item, delButton, buttonForCompList));
-            delButton.addEventListener("click", delFromToDoListPromptAndRemoval(newLi, item));
-            buttonForCompList.addEventListener("click", delItemInCompListAndArray(newLi, item));
+        if ((compList.length > 0 || toDoArray.length > 0) && clearOptions.value == "make a selection") {
+            alert("Please make a selection.")
         }
-        )
-    }
-}
-
-
- 
-function completedButtonPromptAndMoveToComp(listItem, compButton, task, deleteButton, newDelButton) {
-    return function () {
-        if (
-            confirm("You pressed 'completed.' This is task will now be inserted into your completion list Press 'Ok' to continue.")
-        ) {
-            moveTaskToCompListArray(task);
-            delItemFromToDoArrayWhenCompButtonIsClicked(task);
-            listItem.removeChild(compButton)
-            listItem.removeChild(deleteButton);
-            listItem.appendChild(newDelButton);
-            completionList.prepend(listItem);
-            
-        
+        else if (toDoArray.length > 1 && clearOptions.value == "CLEAR TO DOS" && confirm("Your to dos will now be deleted. Press 'OK' to continue.")) {
+            clearAllToDos();
+        } else if (compList.length > 1 && clearOptions.value == "CLEAR COMPLETIONS" && confirm("Your completions will now be deleted. Press 'OK' to continue.")) {
+            clearAllComps();
+        } else if ((compList.length >=1 || toDoArray.length >=1)  && clearOptions.value == "CLEAR ALL" && confirm("Both your to dos and completions will now be deleted. Press 'OK' to continue.")) {
+            clearAllToDos();
+            clearAllComps();
+        } else if (compList.length===0 && toDoArray.length===0) {
+            alert("There are no items in your to dos and completion list.")
+        } else if ((compList.length > 1 && toDoArray.length === 0)||(compList.length === 0 && toDoArray.length > 1) && clearOptions.value == "CLEAR ALL") {
+            alert("There must be at least one item in both your to do list and your compeletions list. ")
         }
         else {
             alert("No changes has occured.")
         }
     }
 }
+clearConfirmedButton.addEventListener("click", clearDomList())
 
-//WORK ON ME
-function deleteToDoTask(li, delTaskAndDueDate, array) {
-    return function () {
-        if (confirm("Do you want to delete this entry?")) {
-            {
-                li.remove("li");
-                delFromTaskAndDueDateInLocalStorage(array, delTaskAndDueDate)
-            }
-
-        }
-    }
-}
-
-function delFromToDoListPromptAndRemoval(listItem, deleteThisItem) {
-    return function () {
-        if (confirm("Do you want to delete this entry?")) {
-            listItem.remove("li");
-            deleteItemInToDoArray(deleteThisItem);
-            alert("Entry has been deleted.")
-        }
-        else {
-            alert("No changes has occured.")
-        }
-    }
-}
 
 function saveCompList() {
     return localStorage.setItem("Saved completions", JSON.stringify(compList));
 }
 
+
 var completionList = document.querySelector('#user-completion-list')
+function displayTaskOnRefresh() {
+    if (localStorage.getItem('Saved To Do\'s') !== null || 0) {
+        var savedUserToDos = localStorage.getItem('Saved To Do\'s');
+        localStorage.setItem("Saved To Do\'s", savedUserToDos);
+        var tasks = JSON.parse(savedUserToDos);
+        renderLocalStorageOntoDom(tasks, toDoArray, toDoList, liAndButtonsDom); 
+        }
+        
+}
 function displayCompListOnRefresh() {
     if (localStorage.getItem("Saved completions") !== null) {
         var getCompItems = localStorage.getItem("Saved completions");
-        console.log(getCompItems);
         userCompletionsList = JSON.parse(getCompItems);
-        console.log(userCompletionsList);
-        userCompletionsList.forEach(function (item) {
-            var newLi = document.createElement("li");
-            var delButton = document.createElement("button");
-            var delButtonText = document.createTextNode("DEL")
-            var text = document.createTextNode(item);
-            compList.push(item)
-            delButton.appendChild(delButtonText);
-            newLi.appendChild(text);
-            newLi.appendChild(delButton);
-            completionList.prepend(newLi);
-            delButton.addEventListener("click", delItemInCompListAndArray(newLi,item))
-        })
+        renderLocalStorageOntoDom(userCompletionsList, compList, completionList, liAndButtonsDom);     
     }
 }
 
 
+function renderLocalStorageOntoDom(localArray, globalVar, domList, fn) {
+    localArray.forEach(function (item) {
+        globalVar.push(item);
+        domList.prepend(fn(item));
+        
+    })
+    
+}
+
 
 displayTaskOnRefresh();
 displayCompListOnRefresh();
-getToDoTaskPutThemIntoToDoArray(); 
-
-
-
 
 
 
